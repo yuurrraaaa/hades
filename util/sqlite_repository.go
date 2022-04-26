@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/mattn/go-sqlite3"
+	"log"
 )
 
 var (
@@ -89,6 +90,19 @@ func (r *SQLiteRepository) Update(query string, id int64, args ...any) error {
 	}
 
 	return nil
+}
+
+func (r *SQLiteRepository) GetByID(query string, args ...any) *sql.Row {
+	row := r.db.QueryRow(query, args...)
+	return row
+}
+
+func (r *SQLiteRepository) GetManyByID(query string, args ...any) *sql.Rows {
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return rows
 }
 
 func (r *SQLiteRepository) Delete(query string, args ...any) error {

@@ -2,7 +2,6 @@ package status
 
 import (
 	"hades/util"
-	"hades/website"
 	"time"
 )
 
@@ -10,7 +9,7 @@ type Status struct {
 	ID        int64
 	Status    int
 	CreatedAt time.Time
-	Website   website.Website
+	WebsiteId int64
 }
 
 type Statuses interface {
@@ -20,7 +19,7 @@ type Statuses interface {
 }
 
 func (status *Status) Create(r *util.SQLiteRepository) (*Status, error) {
-	id, err := r.Create("INSERT INTO statuses(status, created_at, website_id) values(?,?,?)", status.Status, time.Now(), status.Website.ID)
+	id, err := r.Create("INSERT INTO statuses(status, created_at, website_id) values(?,?,?)", status.Status, time.Now(), status.WebsiteId)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +38,7 @@ func All(r *util.SQLiteRepository) ([]Status, error) {
 	var all []Status
 	for rows.Next() {
 		var status Status
-		if err := rows.Scan(&status.ID, &status.Status, &status.CreatedAt, &status.Website); err != nil {
+		if err := rows.Scan(&status.ID, &status.Status, &status.CreatedAt, &status.WebsiteId); err != nil {
 			return nil, err
 		}
 		all = append(all, status)
@@ -53,4 +52,18 @@ func (status *Status) Delete(r *util.SQLiteRepository) error {
 		return err
 	}
 	return err
+}
+
+func GetStatusesByWebsiteID(r *util.SQLiteRepository, websiteId string) ([]Status, error) {
+	rows := r.GetManyByID("SELECT * FROM statuses WHERE website_id = ?", websiteId)
+
+	var all []Status
+	for rows.Next() {
+		var status Status
+		if err := rows.Scan(&status.ID, &status.Status, &status.CreatedAt, &status.WebsiteId); err != nil {
+			return nil, err
+		}
+		all = append(all, status)
+	}
+	return all, nil
 }

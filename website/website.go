@@ -1,17 +1,21 @@
 package website
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
+	"hades/status"
 	"hades/util"
 	"log"
 	"net/http"
 )
 
 type Website struct {
-	ID   int64
-	Name string
-	URL  string
-	Rank int64
+	ID       int64
+	Name     string
+	URL      string
+	Rank     int64
+	Statuses []status.Status
 }
 
 func (website *Website) GetStatus() (status int) {
@@ -19,7 +23,7 @@ func (website *Website) GetStatus() (status int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	defer resp.Body.Close()
 	fmt.Println("The status code we got is:", resp.StatusCode)
 	return resp.StatusCode
 }
@@ -32,6 +36,19 @@ func (website *Website) Create(r *util.SQLiteRepository) (*Website, error) {
 	website.ID = id
 
 	return website, nil
+}
+
+func GetWebsiteByID(r *util.SQLiteRepository, id string) (*Website, error) {
+	row := r.GetByID("SELECT * FROM websites WHERE id = ?", id)
+
+	var website Website
+	if err := row.Scan(&website.ID, &website.Name, &website.URL, &website.Rank); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, util.ErrNotExists
+		}
+		return nil, err
+	}
+	return &website, nil
 }
 
 func All(r *util.SQLiteRepository) ([]Website, error) {
