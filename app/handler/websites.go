@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"hades/status"
+	"hades/app/model"
 	"hades/util"
-	"hades/website"
 	"log"
 	"net/http"
 
@@ -11,7 +10,7 @@ import (
 )
 
 func GetAllWebsites(db *util.SQLiteRepository, w http.ResponseWriter, r *http.Request) {
-	websites, err := website.All(db)
+	websites, err := model.AllWebsites(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,7 +21,7 @@ func GetWebsite(db *util.SQLiteRepository, w http.ResponseWriter, r *http.Reques
 	vars := mux.Vars(r)
 
 	id := vars["id"]
-	site, err := website.GetWebsiteByID(db, id)
+	site, err := model.GetWebsiteByID(db, id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +35,7 @@ func GetWebsiteStatuses(db *util.SQLiteRepository, w http.ResponseWriter, r *htt
 	vars := mux.Vars(r)
 
 	websiteId := vars["website_id"]
-	statuses, err := status.GetStatusesByWebsiteID(db, websiteId)
+	statuses, err := model.GetStatusesByWebsiteID(db, websiteId)
 	if err != nil {
 		log.Fatal(err)
 	}

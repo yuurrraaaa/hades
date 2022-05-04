@@ -1,21 +1,20 @@
-package website
+package model
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"hades/status"
 	"hades/util"
 	"log"
 	"net/http"
 )
 
 type Website struct {
-	ID       int64
-	Name     string
-	URL      string
-	Rank     int64
-	Statuses []status.Status
+	ID       int64    `json:"id"`
+	Name     string   `json:"name"`
+	URL      string   `json:"url"`
+	Rank     int64    `json:"rank"`
+	Statuses []Status `json:"statuses"`
 }
 
 func (website *Website) GetStatus() (status int) {
@@ -51,7 +50,7 @@ func GetWebsiteByID(r *util.SQLiteRepository, id string) (*Website, error) {
 	return &website, nil
 }
 
-func All(r *util.SQLiteRepository) ([]Website, error) {
+func AllWebsites(r *util.SQLiteRepository) ([]Website, error) {
 	rows, err := r.All("SELECT * FROM websites")
 	if err != nil {
 		return nil, err

@@ -1,4 +1,4 @@
-package status
+package model
 
 import (
 	"hades/util"
@@ -6,10 +6,10 @@ import (
 )
 
 type Status struct {
-	ID        int64
-	Status    int
-	CreatedAt time.Time
-	WebsiteId int64
+	ID        int64     `json:"id"`
+	Status    int       `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	WebsiteId int64     `json:"website_id"`
 }
 
 type Statuses interface {
@@ -28,7 +28,7 @@ func (status *Status) Create(r *util.SQLiteRepository) (*Status, error) {
 	return status, nil
 }
 
-func All(r *util.SQLiteRepository) ([]Status, error) {
+func AllStatuses(r *util.SQLiteRepository) ([]Status, error) {
 	rows, err := r.All("SELECT * FROM statuses")
 	if err != nil {
 		return nil, err
